@@ -22,10 +22,11 @@ class ViewController: UIViewController {
         
         randomView.showsFPS = true
         randomView.showsNodeCount = true
-        //randomView.multipleTouchEnabled = true
+        randomView.showsPhysics = true
+        randomView.multipleTouchEnabled = true
         
         gameScene = GameScene(size: CGSize(width: self.view.frame.width, height: self.view.frame.height))
-        
+        gameScene.scaleMode = .ResizeFill
         randomView.presentScene(gameScene)
         
     }

@@ -7,7 +7,12 @@
 //
 
 import Foundation
+import SpriteKit
 
-public class ContactDelegate {
+public class ContactDelegate: NSObject, SKPhysicsContactDelegate {
+    
+    
+    
+    
     
 }
