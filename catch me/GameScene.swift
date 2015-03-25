@@ -163,8 +163,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         var imageNumber = Int(arc4random_uniform(count))
         
-        
-        
         let maxX = heroSprite!.position.x + self.frame.width
         let minX = heroSprite!.position.x - self.frame.width
         let maxY = heroSprite!.position.y + self.frame.height
@@ -185,6 +183,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 }
                 brick.position.y = minY + CGFloat   (j) * imageHeight
                 brick.zPosition = 0
+                brick.lightingBitMask = ShadowCategory.All
                 backgroundArray.append(brick)
             }
         }
@@ -238,8 +237,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func dropBomb(x: CGFloat, y: CGFloat){
-        var explosionEmitter = SKEmitterNode(fileNamed: "ExplosionFire.sks")
-        var sparkingEmitter = SKEmitterNode(fileNamed: "SparkParticle.sks")
+        var explosionEmitter = SKEmitterNode(fileNamed: "ExplosionFire.sks") // add lightening
+        var sparkingEmitter = SKEmitterNode(fileNamed: "SparkParticle.sks") // add lightening
         
         bombSprite = SKSpriteNode(texture: bombImage)
         bombSprite.position.x = x
@@ -405,7 +404,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         ground.zPosition = 1
         //ground.physicsBody?.pinned = true
         ground.physicsBody?.allowsRotation = false
-        ground.shadowCastBitMask = ShadowCategory.All
+        ground.lightingBitMask = ShadowCategory.All
         
     }
     
@@ -413,11 +412,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         light = SKLightNode()
         light.categoryBitMask = ShadowCategory.Ground
-        light.ambientColor = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.7)
-        light.lightColor = UIColor(red: 1.0, green: 1.0, blue: 0.1, alpha: 1)
+        light.ambientColor = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.4)
+        //light.lightColor = UIColor(red: 1.0, green: 1.0, blue: 0.1, alpha: 1)
+        light.lightColor = SKColor(hue: 0.62 , saturation: 0.89, brightness: 1.0, alpha: 0.4)
         light.shadowColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.7)
         light.enabled = true
-        light.falloff = 1
+        light.falloff = 0.001
         
     }
     
