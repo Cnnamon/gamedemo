@@ -7,12 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2F18F4831AC2F3820080C37D /* SparkParticle.sks in Resources */ = {isa = PBXBuildFile; fileRef = 2F18F4811AC2F3820080C37D /* SparkParticle.sks */; };
+		2F18F4841AC2F3820080C37D /* spark.png in Resources */ = {isa = PBXBuildFile; fileRef = 2F18F4821AC2F3820080C37D /* spark.png */; };
 		2F3E587F1AA748B900CB4309 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F3E587E1AA748B900CB4309 /* AppDelegate.swift */; };
 		2F3E58811AA748B900CB4309 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F3E58801AA748B900CB4309 /* ViewController.swift */; };
 		2F3E58841AA748B900CB4309 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2F3E58821AA748B900CB4309 /* Main.storyboard */; };
 		2F3E58861AA748B900CB4309 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2F3E58851AA748B900CB4309 /* Images.xcassets */; };
 		2F3E58891AA748B900CB4309 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2F3E58871AA748B900CB4309 /* LaunchScreen.xib */; };
 		2F3E58951AA748B900CB4309 /* catch_meTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F3E58941AA748B900CB4309 /* catch_meTests.swift */; };
+		2F6B9D811AC2FFC1009C726A /* ExplosionFire.sks in Resources */ = {isa = PBXBuildFile; fileRef = 2F6B9D801AC2FFC1009C726A /* ExplosionFire.sks */; };
 		2FD1B81D1AAAF4E000D49D34 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD1B81C1AAAF4E000D49D34 /* GameScene.swift */; };
 		2FE7E6D71AAB0C9C00B8475B /* ContactDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FE7E6D61AAB0C9C00B8475B /* ContactDelegate.swift */; };
 /* End PBXBuildFile section */
@@ -28,6 +31,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2F18F4811AC2F3820080C37D /* SparkParticle.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = SparkParticle.sks; sourceTree = "<group>"; };
+		2F18F4821AC2F3820080C37D /* spark.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = spark.png; sourceTree = "<group>"; };
 		2F3E58791AA748B900CB4309 /* catch me.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "catch me.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F3E587D1AA748B900CB4309 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2F3E587E1AA748B900CB4309 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -38,6 +43,7 @@
 		2F3E588E1AA748B900CB4309 /* catch meTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "catch meTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2F3E58931AA748B900CB4309 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2F3E58941AA748B900CB4309 /* catch_meTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = catch_meTests.swift; sourceTree = "<group>"; };
+		2F6B9D801AC2FFC1009C726A /* ExplosionFire.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = ExplosionFire.sks; sourceTree = "<group>"; };
 		2FD1B81C1AAAF4E000D49D34 /* GameScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameScene.swift; sourceTree = "<group>"; };
 		2FE7E6D61AAB0C9C00B8475B /* ContactDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -130,6 +136,9 @@
 				2F3E58871AA748B900CB4309 /* LaunchScreen.xib */,
 				2F3E58851AA748B900CB4309 /* Images.xcassets */,
 				2F3E58821AA748B900CB4309 /* Main.storyboard */,
+				2F18F4811AC2F3820080C37D /* SparkParticle.sks */,
+				2F18F4821AC2F3820080C37D /* spark.png */,
+				2F6B9D801AC2FFC1009C726A /* ExplosionFire.sks */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -222,9 +231,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2F18F4841AC2F3820080C37D /* spark.png in Resources */,
 				2F3E58841AA748B900CB4309 /* Main.storyboard in Resources */,
+				2F18F4831AC2F3820080C37D /* SparkParticle.sks in Resources */,
 				2F3E58891AA748B900CB4309 /* LaunchScreen.xib in Resources */,
 				2F3E58861AA748B900CB4309 /* Images.xcassets in Resources */,
+				2F6B9D811AC2FFC1009C726A /* ExplosionFire.sks in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
