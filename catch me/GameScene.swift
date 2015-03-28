@@ -19,6 +19,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         static let Ground       : UInt32 = 0b1       // 1
         static let Hero         : UInt32 = 0b10      // 2
         static let Bomb         : UInt32 = 0b100     // 4
+        static let Explosion    : UInt32 = 0b1000    // 8
+        static let Blocks       : UInt32 = 0b10000   // 16
     }
     
     struct ShadowCategory {
@@ -44,10 +46,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var backgroundImagesArray = [SKTexture]()
     var backgroundArray = [SKSpriteNode]()
     // Terrain
-    var groundArray = [SKSpriteNode]()
+    var blocksArray = [SKSpriteNode]()
     // Bomb
     let bombImage = SKTexture(imageNamed: "Bomb.png")
-    var bombSprite : SKSpriteNode!
+    //var bombSprite : SKSpriteNode!
+    // Ground
+    let groundImage = SKTexture(imageNamed: "Ground.png")
+    
     // Moving and jumping objects
     var moveToRight = false
     var moveToLeft = false
@@ -58,6 +63,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var right = false
     // Indicator letting/banning from moving
     var colliding = 0
+    
     // Flag indicating whether we've setup the camera system yet.
     var isCreated: Bool = false
     // The root node of your game world. Attach game entities
@@ -68,18 +74,28 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var overlay: SKNode?
     // The camera. Move this node to change what parts of the world are visible.
     var camera: SKNode?
+    
     // Generated World coordinates to
     var generatedWorldToX: Int = 0
     var generatedWorldToY: Int = 0
     // Generated World coordinates from
     var generatedWorldFromX: Int = 0
     var generatedWorldFromY: Int = 0
+    
     // Light for hero
     var light = SKLightNode()
     // Emiter for hero
     var emiter = SKEmitterNode()
     // Skaitiklis kiek bombu padeta
     var bombsCounter: Int = 0
+    
+    // Generate ground
+    let groundBlocksY = 5
+    let groundBlocksX = 5
+    let terrainY = -200
+    let groundMinX = -700
+    let groundMaxX = 700
+    let groundY = -1000
     
     override func didMoveToView(view: SKView) {
         
@@ -110,22 +126,16 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             physicsWorld.contactDelegate = self
             
             //creating ground
-            for(var i = 0; i < 100; i++) {
-                var ground = SKSpriteNode(imageNamed: "Ground.png")
-                ground.xScale = 0.5
-                ground.yScale = 0.1
-                createGround(ground, view: view)
-                ground.shadowCastBitMask = ShadowCategory.Ground
-                ground.zPosition = 1
-                groundArray += [ground]
-                world!.addChild(ground)
-            }
+            generateGround()
+            
+            //creating blocks
+            generateTerrain(view)
             
             // creating main character
             createHero(view)
             setHeroStats()
-            createLight(view)
-            heroSprite?.addChild(light)
+            //createLight(view)
+            heroSprite?.addChild(light) //-- LIGHTS
             world!.addChild(heroSprite!)
             
             // background color
@@ -146,10 +156,42 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
+    func generateTerrain(view: SKView) {
+        //println(groundHeight)
+        let xScale: CGFloat = 0.502
+        let yScale: CGFloat = 0.5
+        let sprite = SKSpriteNode(imageNamed: "Block.png")
+        
+        let length = CGFloat()
+        let sizeWidth = sprite.size.width * xScale
+        let sizeHeight = sprite.size.height * yScale
+        //let collumns = Int(length / sizeWidth)
+        let collumns = 45
+        //let rows = Int((CGFloat(terrainY) - CGFloat(groundY)) / sizeHeight)
+        let rows = 10
+        //println(collumns)
+        //println(rows)
+        var currentRows = rows - Int(arc4random_uniform(UInt32(rows)))
+        //println(currentRows)
+        for(var i = 0; i < collumns; i++) {
+            for(var j = 0; j < rows; j++) {
+                var blocks = SKSpriteNode(imageNamed: "Block.png")
+                blocks.xScale = xScale
+                blocks.yScale = yScale
+                blocks.position = CGPoint(x: groundWidth/2 + CGFloat(i) * CGFloat(sizeWidth) ,y: CGFloat(groundY) + groundHeight/2 + CGFloat(j) * CGFloat(sizeHeight))
+                //println("blocks \(blocks.position.y)")
+                createBlocks(blocks, view: view)
+                blocks.shadowCastBitMask = ShadowCategory.Ground
+                blocks.zPosition = 1
+                world!.addChild(blocks)
+            }
+        }
+    }
+    
     func setHeroStats(){
         HeroStats.ExplosionTimeDelay = 5
         HeroStats.Lifes = 3
-        HeroStats.BombsCount = 1
+        HeroStats.BombsCount = 2
         HeroStats.ExplosionTime = 1
         HeroStats.BombPower = 1
     }
@@ -163,17 +205,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         var imageNumber = Int(arc4random_uniform(count))
         
-        let maxX = heroSprite!.position.x + self.frame.width
-        let minX = heroSprite!.position.x - self.frame.width
-        let maxY = heroSprite!.position.y + self.frame.height
-        let minY = heroSprite!.position.y - self.frame.height
+        let maxX = groundWidth / 2 + groundWidth * 3
+        let minX = groundWidth / 2
+        let maxY = CGFloat(groundY) + groundHeight/2 + groundHeight * 4
+        let minY = CGFloat(groundY)
         
-        var collumn = Int (((maxX - minX) + imageLengh/2) / imageLengh)
+        var collumn = Int ((maxX - minX) / imageLengh) + 1
+        //println(collumn)
         var row = Int ((maxY - minY) / imageHeight)
-        
-        for(var i = 0 ; i<row; i++){
+        //println(row)
+        for(var i = 0 ; i<collumn; i++){
             let index = imageLengh / 2
-            for(var j = 0; j<collumn; j++){
+            for(var j = 0; j<row; j++){
                 var imageNumber = Int(arc4random_uniform(count))
                 var brick = SKSpriteNode(texture: backgroundImagesArray[imageNumber])
                 if(j % 2 == 0){
@@ -237,28 +280,40 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func dropBomb(x: CGFloat, y: CGFloat){
-        var explosionEmitter = SKEmitterNode(fileNamed: "ExplosionFire.sks") // add lightening
-        var sparkingEmitter = SKEmitterNode(fileNamed: "SparkParticle.sks") // add lightening
         
-        bombSprite = SKSpriteNode(texture: bombImage)
+        var explosionEmitter = SKEmitterNode(fileNamed: "ExplosionFire.sks") // add lightening
+        explosionEmitter.zPosition = 2
+        explosionEmitter.physicsBody = SKPhysicsBody(circleOfRadius: 100)
+        explosionEmitter.physicsBody?.categoryBitMask = PhysicsCategory.Explosion
+        explosionEmitter.physicsBody?.collisionBitMask = PhysicsCategory.None
+        explosionEmitter.physicsBody?.contactTestBitMask = PhysicsCategory.Blocks
+        explosionEmitter.physicsBody?.dynamic = false
+        
+        var sparkingEmitter = SKEmitterNode(fileNamed: "SparkParticle.sks") // add lightening
+        sparkingEmitter.zPosition = 2
+        
+        var bombSprite = SKSpriteNode(texture: bombImage)
         bombSprite.position.x = x
         bombSprite.position.y = y
         bombSprite.xScale = 0.5
         bombSprite.yScale = 0.5
-        bombSprite!.physicsBody = SKPhysicsBody(rectangleOfSize: bombSprite!.size)
+        let size = CGSize(width: bombSprite.frame.size.width * bombSprite.xScale, height: bombSprite.frame.size.height * bombSprite.yScale)
+        bombSprite.physicsBody = SKPhysicsBody(circleOfRadius: size.width)//texture: bombImage, size: bombImage.size())
         bombSprite.physicsBody?.categoryBitMask = PhysicsCategory.Bomb
-        bombSprite.physicsBody?.collisionBitMask = PhysicsCategory.Ground | PhysicsCategory.Bomb
+        bombSprite.physicsBody?.collisionBitMask = PhysicsCategory.Ground | PhysicsCategory.Hero | PhysicsCategory.Bomb | PhysicsCategory.Blocks
         bombSprite.zPosition = 1
         bombSprite.physicsBody?.dynamic = true
         
         bombSprite.addChild(sparkingEmitter)
+        
         let timeDelay = NSTimeInterval(HeroStats.ExplosionTimeDelay)
         let timeExploding = NSTimeInterval(HeroStats.ExplosionTime)
+        
         bombSprite.runAction(SKAction.waitForDuration(timeDelay), completion: {
             sparkingEmitter.removeFromParent()
-            explosionEmitter.position = self.bombSprite.position
+            explosionEmitter.position = bombSprite.position
             self.world!.addChild(explosionEmitter)
-            self.bombSprite.removeFromParent()
+            bombSprite.removeFromParent()
             self.bombsCounter--
             self.world!.runAction(SKAction.waitForDuration(timeExploding), completion: {
                 explosionEmitter.removeFromParent()
@@ -282,8 +337,53 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         return normaly
     }
     
-    func generateGround(){
+    var groundHeight: CGFloat!
+    var groundWidth: CGFloat!
+    
+    func generateGround () {
         
+        var ground = SKSpriteNode(texture: groundImage)
+        //ground.anchorPoint = CGPoint(x: 0,y: 0)
+        groundWidth = CGFloat (ground.frame.width)
+        groundHeight = CGFloat (ground.frame.height)
+        groundHeight = groundHeight * ground.yScale
+        groundWidth = groundWidth * ground.xScale
+        
+        for (var i = 0; i < groundBlocksX; i++) {
+            
+            createGround((CGFloat(i) * groundWidth), y: CGFloat(groundY))
+            
+            if(i==0){
+                for(var j = 1; j < groundBlocksY; j++){
+                    ground.anchorPoint = CGPoint(x: 0,y: 0)
+                    createGround((CGFloat(i) * groundWidth ), y: CGFloat(groundY) + (CGFloat(groundHeight) * CGFloat(j)))
+                }
+            }
+            if(i == groundBlocksX - 1){
+                for(var j = 1; j < groundBlocksY; j++){
+                    ground.anchorPoint = CGPoint(x: 0,y: 0)
+                    createGround((CGFloat(i) * groundWidth ), y: CGFloat(groundY) + (CGFloat(groundHeight) * CGFloat(j)))
+                }
+            }
+        }
+    }
+    
+    func createGround(x : CGFloat, y: CGFloat){
+        var ground = SKSpriteNode(texture: groundImage)
+        ground.position = CGPoint(x: x, y: y)
+        //println("ground \(ground.position.y)")
+        let size = CGSize(width: groundWidth, height: groundHeight)
+        ground.physicsBody = SKPhysicsBody(rectangleOfSize: ground.frame.size, center: CGPoint(x: 0, y: 0))
+        ground.physicsBody?.dynamic = false
+        ground.physicsBody?.categoryBitMask = PhysicsCategory.Ground
+        ground.physicsBody?.collisionBitMask = PhysicsCategory.All
+        ground.physicsBody?.contactTestBitMask = PhysicsCategory.Hero
+        ground.physicsBody?.affectedByGravity = false
+        ground.zPosition = 1
+        //ground.physicsBody?.pinned = true
+        ground.physicsBody?.allowsRotation = false
+        ground.lightingBitMask = ShadowCategory.All
+        world?.addChild(ground)
     }
     
     override func touchesEnded(touches: NSSet, withEvent event: UIEvent) {
@@ -303,8 +403,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func update(currentTime: NSTimeInterval) {
-        
-        generateGround()
         
         if stopMove {
             
@@ -363,11 +461,22 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             colliding++
         }
         
+        if /*(contact.bodyA.categoryBitMask == PhysicsCategory.Blocks || contact.bodyA.categoryBitMask == PhysicsCategory.Explosion) &&*/ (contact.bodyA.categoryBitMask == PhysicsCategory.Blocks && contact.bodyB.categoryBitMask == PhysicsCategory.Explosion)
+        {
+            //println("hit")
+            for(var i=0; i<blocksArray.count; i++){
+                if(blocksArray[i].physicsBody == contact.bodyA){
+                    blocksArray[i].removeFromParent()
+                }
+            }
+        }
+        
+        
     }
     
     func didEndContact(contact: SKPhysicsContact) {
         
-        if contact.bodyA.categoryBitMask == PhysicsCategory.Ground && contact.bodyB.categoryBitMask == PhysicsCategory.Hero {
+        if contact.bodyA.categoryBitMask == PhysicsCategory.Blocks && contact.bodyB.categoryBitMask == PhysicsCategory.Hero {
             colliding--
         }
         
@@ -378,34 +487,39 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         //size = imagesize
         heroSprite = SKSpriteNode(texture: heroImage)
         heroSprite!.position = CGPoint(x: 300, y: 200)
-        heroSprite!.physicsBody = SKPhysicsBody(rectangleOfSize: heroSprite!.size/*, center: CGPoint(x: -heroSprite.frame.width/16, y: -heroSprite.frame.height/16)*/)
+        //heroSprite!.physicsBody = SKPhysicsBody(rectangleOfSize: heroSprite!.size/*, center: CGPoint(x: -heroSprite.frame.width/16, y: -heroSprite.frame.height/16)*/)
+        heroSprite!.physicsBody = SKPhysicsBody(texture: heroImage, size: heroSprite!.size)
         heroSprite!.physicsBody?.dynamic = true
         heroSprite!.physicsBody?.categoryBitMask = PhysicsCategory.Hero
-        heroSprite!.physicsBody?.collisionBitMask = PhysicsCategory.Ground
+        heroSprite!.physicsBody?.collisionBitMask = PhysicsCategory.Ground | PhysicsCategory.Blocks
         heroSprite!.zPosition = 1
         heroSprite!.xScale = heroSprite!.xScale * -1; // image apsukimas
         heroSprite!.physicsBody?.allowsRotation = false
         
     }
     
-    func createGround(ground: SKSpriteNode, view: SKView){
+    func createBlocks(blocks: SKSpriteNode, view: SKView){
         
         //size = imagesize
-        ground.anchorPoint = CGPoint(x: 0, y: 0)
-        var groundWidth: CGFloat = CGFloat (ground.frame.width)
-        groundWidth = groundWidth * ground.xScale
-        ground.position = CGPoint(x: Int(groundWidth) * groundArray.count, y: 0)
-        ground.physicsBody = SKPhysicsBody(rectangleOfSize: ground.frame.size, center: CGPoint(x: ground.frame.width / 2, y: ground.frame.height / 2))
-        ground.physicsBody?.dynamic = false
-        ground.physicsBody?.categoryBitMask = PhysicsCategory.Ground
-        ground.physicsBody?.collisionBitMask = PhysicsCategory.All
-        ground.physicsBody?.contactTestBitMask = PhysicsCategory.Hero
-        ground.physicsBody?.affectedByGravity = false
-        ground.zPosition = 1
+        blocks.anchorPoint = CGPoint(x: 0, y: 0)
+        //var blocksWidth: CGFloat = CGFloat (blocks.frame.width)
+        //blocksWidth = blocksWidth * blocks.xScale
+        //blocks.position = CGPoint(x: Int(blocksWidth) * blocksArray.count, y: 0)
+        blocks.physicsBody = SKPhysicsBody(rectangleOfSize: blocks.frame.size, center: CGPoint(x: blocks.frame.width / 2, y: blocks.frame.height / 2))
+        blocks.physicsBody?.dynamic = true
+        blocks.physicsBody?.categoryBitMask = PhysicsCategory.Blocks
+        blocks.physicsBody?.collisionBitMask = PhysicsCategory.All ^ PhysicsCategory.Explosion
+        blocks.physicsBody?.contactTestBitMask = PhysicsCategory.Hero | PhysicsCategory.Explosion
+        blocks.physicsBody?.affectedByGravity = false
+        blocks.physicsBody?.mass = 100
+        blocks.physicsBody?.friction = 100
+        blocks.zPosition = 1
+        blocks.physicsBody?.usesPreciseCollisionDetection = false
         //ground.physicsBody?.pinned = true
-        ground.physicsBody?.allowsRotation = false
-        ground.lightingBitMask = ShadowCategory.All
-        
+        blocks.physicsBody?.allowsRotation = true
+        blocks.shadowedBitMask = ShadowCategory.All
+        blocks.lightingBitMask = ShadowCategory.All
+        blocksArray.append(blocks)
     }
     
     func createLight(view: SKView){
@@ -415,7 +529,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         light.ambientColor = UIColor(red: 1.0, green: 1.0, blue: 1.0, alpha: 0.4)
         //light.lightColor = UIColor(red: 1.0, green: 1.0, blue: 0.1, alpha: 1)
         light.lightColor = SKColor(hue: 0.62 , saturation: 0.89, brightness: 1.0, alpha: 0.4)
-        light.shadowColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.7)
+        light.shadowColor = UIColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.3)
         light.enabled = true
         light.falloff = 0.001
         

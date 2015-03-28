@@ -20,9 +20,9 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        randomView.showsFPS = true
-        randomView.showsNodeCount = true
-        randomView.showsPhysics = true
+        randomView.showsFPS = false
+        randomView.showsNodeCount = false
+        randomView.showsPhysics = false
         randomView.multipleTouchEnabled = true
         
         gameScene = GameScene(size: CGSize(width: self.view.frame.width, height: self.view.frame.height))
